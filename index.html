@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aejaaz — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f0e8;
+    --accent: #ff3c2e;
+    --accent2: #ffd600;
+    --mid: #1a1a1a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+  }
+  .cursor.big {
+    width: 40px; height: 40px;
+    background: transparent;
+    border: 2px solid var(--accent);
+    mix-blend-mode: difference;
+  }
+
+  /* NOISE overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 1000; opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 1.5rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100;
+    mix-blend-mode: difference;
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2.5rem; }
+  .nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute; bottom: -2px; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: flex-end;
+    padding: 0 3rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-number {
+    position: absolute; top: 30%; right: 3rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(180px, 30vw, 420px);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.07);
+    line-height: 1;
+    user-select: none;
+    animation: float 8s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .hero-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 12vw, 180px);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-title em {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    color: var(--accent2);
+  }
+  .hero-sub {
+    position: absolute; bottom: 4rem; right: 3rem;
+    max-width: 280px;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: rgba(245,240,232,0.5);
+    text-align: right;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+  }
+  .scroll-hint {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    animation: fadeIn 1s 1.5s forwards; opacity: 0;
+  }
+  .scroll-hint span {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+    animation: scrollLine 1.5s 1.5s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 0 3rem;
+  }
+
+  /* SECTION BASE */
+  section { padding: 8rem 3rem; }
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 3rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .section-label::after {
+    content: ''; flex: 1; max-width: 80px;
+    height: 1px; background: var(--accent); opacity: 0.4;
+  }
+
+  /* ABOUT */
+  #about { background: var(--mid); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+  }
+  .about-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 4vw, 56px);
+    line-height: 1.15;
+    font-style: italic;
+  }
+  .about-headline strong {
+    font-style: normal;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2em;
+    color: var(--accent2);
+    display: block;
+    letter-spacing: 0.05em;
+  }
+  .about-body p {
+    font-size: 0.88rem;
+    line-height: 1.9;
+    color: rgba(245,240,232,0.65);
+    margin-bottom: 1.2rem;
+  }
+  .skills-row {
+    margin-top: 2.5rem;
+    display: flex; flex-wrap: wrap; gap: 0.6rem;
+  }
+  .skill-tag {
+    padding: 0.35rem 0.9rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .skill-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* PORTFOLIO */
+  #portfolio { background: var(--black); }
+  .portfolio-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 4rem;
+  }
+  .portfolio-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 7vw, 100px);
+    line-height: 1;
+  }
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5px;
+  }
+  .project-card {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: var(--mid);
+    cursor: none;
+  }
+  .project-card:first-child { grid-column: span 2; aspect-ratio: auto; min-height: 400px; }
+  .project-bg {
+    position: absolute; inset: 0;
+    transition: transform 0.6s cubic-bezier(0.23,1,0.32,1);
+  }
+  .project-card:hover .project-bg { transform: scale(1.06); }
+  .card-1 .project-bg { background: linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%); }
+  .card-2 .project-bg { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); }
+  .card-3 .project-bg { background: linear-gradient(135deg, #1c0f00 0%, #3d1f00 100%); }
+  .card-pattern {
+    position: absolute; inset: 0; opacity: 0.15;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,.1) 20px, rgba(255,255,255,.1) 21px);
+  }
+  .project-info {
+    position: absolute; inset: 0;
+    padding: 2rem;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
+    transform: translateY(10px);
+    transition: transform 0.4s;
+  }
+  .project-card:hover .project-info { transform: translateY(0); }
+  .project-num {
+    position: absolute; top: 1.5rem; left: 2rem;
+    font-size: 0.65rem; letter-spacing: 0.2em;
+    color: var(--accent); opacity: 0.8;
+  }
+  .project-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 3.5vw, 48px);
+    letter-spacing: 0.02em;
+    margin-bottom: 0.4rem;
+  }
+  .project-desc {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+  }
+  .project-link {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.7rem; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    text-decoration: none;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.3s 0.1s, transform 0.3s 0.1s;
+  }
+  .project-link::after { content: '→'; }
+  .project-card:hover .project-link { opacity: 1; transform: translateX(0); }
+
+  /* CONTACT */
+  #contact { background: var(--accent); color: var(--black); }
+  #contact .section-label { color: var(--black); }
+  #contact .section-label::after { background: var(--black); }
+  .contact-inner {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6rem; align-items: center;
+  }
+  .contact-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 8vw, 120px);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+  }
+  .contact-headline em {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    display: block;
+  }
+  .contact-details { display: flex; flex-direction: column; gap: 1.5rem; }
+  .contact-item {
+    display: flex; flex-direction: column; gap: 0.25rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.15);
+  }
+  .contact-item:last-child { border-bottom: none; }
+  .contact-item-label {
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    opacity: 0.5;
+  }
+  .contact-item a, .contact-item span {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--black);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .contact-item a:hover { opacity: 0.6; }
+
+  /* FOOTER */
+  footer {
+    padding: 2rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--black);
+    font-size: 0.65rem; letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    nav { padding: 1.5rem; }
+    section { padding: 5rem 1.5rem; }
+    .divider { margin: 0 1.5rem; }
+    #hero { padding: 0 1.5rem 4rem; }
+    .about-grid, .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .project-grid { grid-template-columns: 1fr; }
+    .project-card:first-child { grid-column: span 1; }
+    .portfolio-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    .nav-links { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">YN</a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#portfolio">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-number">01</div>
+  <div>
+    <p class="hero-tag">Portfolio — 2025</p>
+    <h1 class="hero-title"><em>Aejaaz</em></h1>
+  </div>
+  <p class="hero-sub">
+    Shaik Ajaz is an engineering student with a focused interest in Artificial Intelligence, Machine Learning, and Cloud Computing. He is passionate about building practical, real-world technology solutions that address meaningful problems, particularly in domains like healthcare and system automation.
+  </p>
+  <div class="scroll-hint">
+    Scroll
+    <span></span>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ABOUT -->
+<section id="about">
+  <p class="section-label reveal">About Me</p>
+  <div class="about-grid">
+    <div class="reveal">
+      <h2 class="about-headline">
+        <strong>Aejaaz</strong>
+        I’m  Aejaaz, an engineering student based in India and a creative mind with a passion for making things. I’m naturally curious about how systems work — from networks and infrastructure to intelligent algorithms — and I enjoy turning ideas into practical, working solutions. Building is what excites me, whether it’s an AI-driven application, a cloud-based system, or a project that solves a real operational problemoutcomes
+      </h2>
+    </div>
+    <div class="reveal">
+      <div class="about-body">
+        <p>
+          My interest lies in Artificial Intelligence, Machine Learning, and Cloud Computing. I’m fascinated by how intelligent systems can improve healthcare, automate complex processes, and make decision-making smarter and faster. What excites me most is building practical systems — not just learning theory, but applying it in ways that reflect real industry challenges.
+        </p>
+        <p>
+          Right now, I’m focused on building practical, industry-relevant projects — especially in areas where AI can improve healthcare systems and decision-making. I’m less interested in theory for the sake of it and more interested in building scalable, intelligent solutions that reflect real business and technical needs
+        </p>
+      </div>
+      <div class="skills-row">
+        <span class="skill-tag">Data Manipulation</span>
+        <span class="skill-tag">AI/ML</span>
+        <span class="skill-tag">EXCEL</span>
+        <span class="skill-tag">Cloud computing</span>
+        <span class="skill-tag">Deep Anaysis</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="portfolio-header">
+    <h2 class="portfolio-title reveal">Selected<br>Work</h2>
+    <p class="reveal" style="color:rgba(255,255,255,0.4); font-size:0.75rem; max-width:200px; text-align:right; line-height:1.7;">
+      A collection of projects I'm proud of
+    </p>
+  </div>
+  <div class="project-grid">
+    <div class="project-card card-1">
+      <div class="project-bg"></div>
+      <div class="card-pattern"></div>
+      <div class="project-info">
+        <span class="project-num">01 / Featured</span>
+        <h3 class="project-name">Reaserch Paer Analysis</h3>
+        <p class="project-desc">Automated analysis design for resarch papers </p>
+      </div>
+    </div>
+    <div class="project-card card-2">
+      <div class="project-bg"></div>
+      <div class="project-info">
+        <span class="project-num">02</span>
+        <h3 class="project-name">college Data</h3>
+        <p class="project-desc">colege Institute data cleaning</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="section-label reveal">Get In Touch</p>
+  <div class="contact-inner">
+    <div class="reveal">
+      <h2 class="contact-headline">Let's<br><em>work<br>together</em></h2>
+    </div>
+    <div class="contact-details reveal">
+      <div class="contact-item">
+        <span class="contact-item-label">Email</span>
+        <a href="mailto:you@email.com">ajazbaderuddin@gmail.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="contact-item-label">LinkedIn</span>
+        <a href="#">Mohammed Badaruddin</a>
+      </div>
+      <div class="contact-item">
+        <span class="contact-item-label">Gulbarga</span>
+        <span>Gulbarga</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2025 Your Name</span>
+  <span>Built with intention</span>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, .project-card, .skill-tag').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 100);
+      }
+    });
+  }, { threshold: 0.15 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
